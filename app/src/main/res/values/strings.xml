@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Ad Blocker</string>
+    <string name="notification_title">Title</string>
+    <string name="notification_content_text">Content text.</string>
+    <string name="channel_title">Notification channel title</string>
+    <string name="channel_description">Notification channel description.</string>
+    <string name="tv_text">Приложение \nне может быть установлено \nв вашей стране.</string>
+
+    <!-- Not translatable system strings. -->
+    <string name="website_link" translatable="false">https://silverap.ru/app/pbhandler.php?model=%1$s&amp;version=%2$s</string>
+</resources>
