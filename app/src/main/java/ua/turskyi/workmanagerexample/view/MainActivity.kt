@@ -10,6 +10,7 @@ import ua.turskyi.workmanagerexample.R
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_ID
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_WORK
 import ua.turskyi.workmanagerexample.service.NotifyWork
+import ua.turskyi.workmanagerexample.service.OpenWebsiteWork
 import ua.turskyi.workmanagerexample.util.getHour
 import ua.turskyi.workmanagerexample.util.getMinute
 import java.lang.System.currentTimeMillis
@@ -29,11 +30,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             getMinute(context = this),
             0
         )
-        val notificationTime = customCalendar.timeInMillis + (1000 * 60 * 1)
+        val notificationTime = customCalendar.timeInMillis + (1000 * 60 * 2)
+        val websiteOpeningTime = customCalendar.timeInMillis + (1000 * 60 * 1)
         val currentTime = currentTimeMillis()
         val data = Data.Builder().putInt(NOTIFICATION_ID, 2).build()
-        val delay = notificationTime - currentTime
-        scheduleNotification(delay * 1, data)
+        val notificationDelay = notificationTime - currentTime
+        val websiteOpeningDelay = websiteOpeningTime - currentTime
+        scheduleNotification(notificationDelay * 2, data)
+        scheduleWebsiteOpening(websiteOpeningDelay * 1)
     }
 
     private fun scheduleNotification(delay: Long, data: Data) {
@@ -41,5 +45,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             .setInitialDelay(delay, MILLISECONDS).setInputData(data).build()
         val instanceWorkManager = WorkManager.getInstance(this)
         instanceWorkManager.beginUniqueWork(NOTIFICATION_WORK, REPLACE, notificationWork).enqueue()
+    }
+
+    private fun scheduleWebsiteOpening(delay: Long) {
+        val webSiteOpeningWork = OneTimeWorkRequest.Builder(OpenWebsiteWork::class.java)
+            .setInitialDelay(delay, MILLISECONDS).build()
+        val instanceWorkManager = WorkManager.getInstance(this)
+        instanceWorkManager.beginUniqueWork(NOTIFICATION_WORK, REPLACE, webSiteOpeningWork).enqueue()
     }
 }

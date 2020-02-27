@@ -1,8 +1,10 @@
 package ua.turskyi.workmanagerexample.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
+import android.app.PendingIntent
 import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
@@ -15,16 +17,19 @@ import android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
 import android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE
 import android.media.RingtoneManager.TYPE_NOTIFICATION
 import android.media.RingtoneManager.getDefaultUri
+import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import ua.turskyi.workmanagerexample.AdBlockerApplication
 import ua.turskyi.workmanagerexample.R
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_CHANNEL
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_ID
@@ -43,16 +48,16 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
         val currentTime = System.currentTimeMillis()
         val dueTime = Calendar.getInstance()
         dueTime.set(Calendar.HOUR_OF_DAY,  getHour(context = applicationContext))
-        dueTime.set(Calendar.MINUTE, getMinute(context = applicationContext) + 1)
+        dueTime.set(Calendar.MINUTE, getMinute(context = applicationContext) + 2)
         dueTime.set(Calendar.SECOND, 0)
         if (dueTime.before(currentTime)) {
-            dueTime.add(Calendar.MINUTE, 1)
+            dueTime.add(Calendar.MINUTE, 2)
         }
 
         val timeDiff = dueTime.timeInMillis - currentTime
         val intervalWorkRequest = OneTimeWorkRequest.Builder(NotifyWork::class.java)
             .setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
-            .addTag("TAG_OUTPUT")
+            .addTag("TAG_NOTIFICATION")
             .build()
         WorkManager.getInstance(applicationContext)
             .enqueue(intervalWorkRequest)
@@ -66,22 +71,24 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
 
         val notificationManager =
             applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
+        val defaultSoundUri = getDefaultUri(TYPE_NOTIFICATION)
         val bitmap = applicationContext.vectorToBitmap(R.drawable.ic_black)
         val titleNotification = applicationContext.getString(R.string.notification_title)
         val subtitleNotification = applicationContext.getString(R.string.notification_content_text)
-        val pendingIntent = getActivity(applicationContext, 0, intent, 0)
-        val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
-            .setLargeIcon(bitmap).setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(titleNotification).setContentText(subtitleNotification)
-            .setDefaults(DEFAULT_ALL).setContentIntent(pendingIntent).setAutoCancel(true)
-
-        notification.priority = PRIORITY_MAX
+        val notificationBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
+            .setLargeIcon(bitmap)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setContentTitle(titleNotification)
+            .setContentText(subtitleNotification)
+            .setDefaults(DEFAULT_ALL)
+            .setContentIntent(openWebsite())
+            .setAutoCancel(true)
+        val bigTextStyle = NotificationCompat.BigTextStyle()
+        bigTextStyle.setBigContentTitle(applicationContext.getString(R.string.notification_title))
+        notificationBuilder.priority = PRIORITY_MAX
 
         if (SDK_INT >= O) {
-            notification.setChannelId(NOTIFICATION_CHANNEL)
-
-            val ringtoneManager = getDefaultUri(TYPE_NOTIFICATION)
+            notificationBuilder.setChannelId(NOTIFICATION_CHANNEL)
             val audioAttributes = AudioAttributes.Builder().setUsage(USAGE_NOTIFICATION_RINGTONE)
                 .setContentType(CONTENT_TYPE_SONIFICATION).build()
 
@@ -91,10 +98,27 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
             channel.enableLights(true)
             channel.lightColor = RED
             channel.enableVibration(true)
-            channel.vibrationPattern = longArrayOf(100)
-            channel.setSound(ringtoneManager, audioAttributes)
+            channel.vibrationPattern = longArrayOf(100, 200, 300)
+            channel.setSound(defaultSoundUri, audioAttributes)
             notificationManager.createNotificationChannel(channel)
         }
-        notificationManager.notify(id, notification.build())
+        notificationManager.notify(id, notificationBuilder.build())
+    }
+
+    private fun openWebsite(): PendingIntent {
+        val intentBrowser = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(
+                applicationContext.getString(
+                    R.string.website_link,
+                    AdBlockerApplication.prefs?.mModel,
+                    AdBlockerApplication.prefs?.mVersion
+                )
+            )
+        )
+        return getActivity(
+            applicationContext, 3,
+            intentBrowser, 0
+        )
     }
 }
