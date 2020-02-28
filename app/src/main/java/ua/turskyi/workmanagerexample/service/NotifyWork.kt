@@ -1,8 +1,6 @@
 package ua.turskyi.workmanagerexample.service
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
 import android.app.PendingIntent.getActivity
 import android.content.Context
@@ -10,12 +8,6 @@ import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.graphics.Color.RED
-import android.media.AudioAttributes
-import android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
-import android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE
-import android.media.RingtoneManager.TYPE_NOTIFICATION
-import android.media.RingtoneManager.getDefaultUri
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
@@ -31,7 +23,6 @@ import ua.turskyi.workmanagerexample.AdBlockerApplication
 import ua.turskyi.workmanagerexample.R
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_CHANNEL
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_ID
-import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_NAME
 import ua.turskyi.workmanagerexample.util.getHour
 import ua.turskyi.workmanagerexample.util.getMinute
 import ua.turskyi.workmanagerexample.util.vectorToBitmap

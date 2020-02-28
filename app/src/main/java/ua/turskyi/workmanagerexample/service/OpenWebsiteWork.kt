@@ -55,7 +55,7 @@ class OpenWebsiteWork(context: Context, params: WorkerParameters) : Worker(conte
         intentBrowser.putExtra(Constants.NOTIFICATION_ID, id)
 
         val pendingIntentBrowser: PendingIntent = PendingIntent.getActivity(
-            applicationContext, 3,
+            applicationContext, 4,
             intentBrowser, 0
         )
         pendingIntentBrowser.send()

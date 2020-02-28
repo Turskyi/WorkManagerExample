@@ -15,12 +15,8 @@ import ua.turskyi.workmanagerexample.util.getDeviceName
 
 class AdBlockerApplication : Application() {
     companion object {
-        lateinit var instance: AdBlockerApplication
         var prefs: Prefs? = null
     }
-
-    private var model: String? = ""
-    private var version: String? = ""
 
     override fun onCreate() {
         prefs = Prefs(applicationContext)
