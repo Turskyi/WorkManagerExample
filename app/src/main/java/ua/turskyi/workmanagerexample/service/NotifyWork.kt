@@ -53,7 +53,8 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
         }
 
         val timeDiff = dueTime.timeInMillis - currentTime
-        val intervalWorkRequest = OneTimeWorkRequest.Builder(NotifyWork::class.java)
+        val intervalWorkRequest =
+            OneTimeWorkRequest.Builder(NotifyWork::class.java)
             .setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
             .addTag("TAG_NOTIFICATION")
             .build()
@@ -72,7 +73,8 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
         val bitmap = applicationContext.vectorToBitmap(R.drawable.ic_black)
         val titleNotification = applicationContext.getString(R.string.notification_title)
         val subtitleNotification = applicationContext.getString(R.string.notification_content_text)
-        val notificationBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
+        val notificationBuilder =
+            NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
             .setLargeIcon(bitmap)
             .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentTitle(titleNotification)
