@@ -1,6 +1,5 @@
 package ua.turskyi.workmanagerexample.service
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
@@ -23,7 +22,6 @@ import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -71,7 +69,6 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
 
         val notificationManager =
             applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val defaultSoundUri = getDefaultUri(TYPE_NOTIFICATION)
         val bitmap = applicationContext.vectorToBitmap(R.drawable.ic_black)
         val titleNotification = applicationContext.getString(R.string.notification_title)
         val subtitleNotification = applicationContext.getString(R.string.notification_content_text)
@@ -86,21 +83,8 @@ class NotifyWork(context: Context, params: WorkerParameters) : Worker(context, p
         val bigTextStyle = NotificationCompat.BigTextStyle()
         bigTextStyle.setBigContentTitle(applicationContext.getString(R.string.notification_title))
         notificationBuilder.priority = PRIORITY_MAX
-
         if (SDK_INT >= O) {
             notificationBuilder.setChannelId(NOTIFICATION_CHANNEL)
-            val audioAttributes = AudioAttributes.Builder().setUsage(USAGE_NOTIFICATION_RINGTONE)
-                .setContentType(CONTENT_TYPE_SONIFICATION).build()
-
-            val channel =
-                NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, IMPORTANCE_HIGH)
-
-            channel.enableLights(true)
-            channel.lightColor = RED
-            channel.enableVibration(true)
-            channel.vibrationPattern = longArrayOf(100, 200, 300)
-            channel.setSound(defaultSoundUri, audioAttributes)
-            notificationManager.createNotificationChannel(channel)
         }
         notificationManager.notify(id, notificationBuilder.build())
     }

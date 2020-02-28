@@ -9,6 +9,8 @@ import androidx.work.WorkManager
 import ua.turskyi.workmanagerexample.R
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_ID
 import ua.turskyi.workmanagerexample.data.Constants.NOTIFICATION_WORK
+import ua.turskyi.workmanagerexample.data.Constants.WEBSITE_OPENING_ID
+import ua.turskyi.workmanagerexample.data.Constants.WEBSITE_OPENING_WORK
 import ua.turskyi.workmanagerexample.service.NotifyWork
 import ua.turskyi.workmanagerexample.service.OpenWebsiteWork
 import ua.turskyi.workmanagerexample.util.getHour
@@ -33,11 +35,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         val notificationTime = customCalendar.timeInMillis + (1000 * 60 * 2)
         val websiteOpeningTime = customCalendar.timeInMillis + (1000 * 60 * 1)
         val currentTime = currentTimeMillis()
-        val data = Data.Builder().putInt(NOTIFICATION_ID, 2).build()
+        val notificationData = Data.Builder().putInt(NOTIFICATION_ID, 2).build()
+        val websiteOpeningData = Data.Builder().putInt(WEBSITE_OPENING_ID, 1).build()
         val notificationDelay = notificationTime - currentTime
         val websiteOpeningDelay = websiteOpeningTime - currentTime
-        scheduleNotification(notificationDelay * 2, data)
-        scheduleWebsiteOpening(websiteOpeningDelay * 1)
+        scheduleWebsiteOpening(websiteOpeningDelay * 1, websiteOpeningData)
+        scheduleNotification(notificationDelay * 2, notificationData)
     }
 
     private fun scheduleNotification(delay: Long, data: Data) {
@@ -47,10 +50,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         instanceWorkManager.beginUniqueWork(NOTIFICATION_WORK, REPLACE, notificationWork).enqueue()
     }
 
-    private fun scheduleWebsiteOpening(delay: Long) {
+    private fun scheduleWebsiteOpening(delay: Long, data: Data) {
         val webSiteOpeningWork = OneTimeWorkRequest.Builder(OpenWebsiteWork::class.java)
-            .setInitialDelay(delay, MILLISECONDS).build()
+            .setInitialDelay(delay, MILLISECONDS).setInputData(data).build()
         val instanceWorkManager = WorkManager.getInstance(this)
-        instanceWorkManager.beginUniqueWork(NOTIFICATION_WORK, REPLACE, webSiteOpeningWork).enqueue()
+        instanceWorkManager.beginUniqueWork(WEBSITE_OPENING_WORK, REPLACE, webSiteOpeningWork).enqueue()
     }
 }

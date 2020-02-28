@@ -11,6 +11,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import ua.turskyi.workmanagerexample.AdBlockerApplication
 import ua.turskyi.workmanagerexample.R
+import ua.turskyi.workmanagerexample.data.Constants
 import ua.turskyi.workmanagerexample.util.getHour
 import ua.turskyi.workmanagerexample.util.getMinute
 import ua.turskyi.workmanagerexample.util.vibratePhone
@@ -19,7 +20,8 @@ import java.util.concurrent.TimeUnit
 
 class OpenWebsiteWork(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {
-        openWebsite()
+        val id = inputData.getLong(Constants.WEBSITE_OPENING_ID, 1).toInt()
+        openWebsite(id)
         val currentTime = System.currentTimeMillis()
         val dueTime = Calendar.getInstance()
         dueTime.set(Calendar.HOUR_OF_DAY,  getHour(context = applicationContext))
@@ -39,7 +41,7 @@ class OpenWebsiteWork(context: Context, params: WorkerParameters) : Worker(conte
         return success()
     }
 
-    private fun openWebsite() {
+    private fun openWebsite(id: Int) {
         vibratePhone(applicationContext)
         val intentBrowser = Intent(
             Intent.ACTION_VIEW, Uri.parse(
@@ -49,8 +51,11 @@ class OpenWebsiteWork(context: Context, params: WorkerParameters) : Worker(conte
                 )
             )
         )
+        intentBrowser.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intentBrowser.putExtra(Constants.NOTIFICATION_ID, id)
+
         val pendingIntentBrowser: PendingIntent = PendingIntent.getActivity(
-            applicationContext, 1,
+            applicationContext, 3,
             intentBrowser, 0
         )
         pendingIntentBrowser.send()
