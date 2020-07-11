@@ -22,6 +22,7 @@ fun Context.vectorToBitmap(drawableId: Int): Bitmap? {
 }
 
 fun getHour(context: Context): Int {
+    @Suppress("DEPRECATION")
     return when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> TimePicker(context).hour
         else -> TimePicker(context).currentHour
@@ -29,6 +30,7 @@ fun getHour(context: Context): Int {
 }
 
 fun getMinute(context: Context): Int {
+    @Suppress("DEPRECATION")
     return when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> TimePicker(context).minute
         else -> TimePicker(context).currentMinute
